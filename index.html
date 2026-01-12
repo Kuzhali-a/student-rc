@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Student Test</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f7ff;
+  padding: 20px;
+}
+
+.screen { display: none; }
+.active { display: block; }
+
+h2 { font-size: 26px; }
+p, .question { font-size: 22px; }
+
+input {
+  font-size: 20px;
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+}
+
+button {
+  font-size: 22px;
+  padding: 14px;
+  width: 100%;
+  margin-top: 15px;
+}
+
+img {
+  max-width: 220px;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 10px auto;
+  border-radius: 8px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- PAGE 1 -->
+<div id="page1" class="screen active">
+  <h2>Student Details</h2>
+  <input id="name" placeholder="Student Name">
+
+  <h3>Section</h3>
+  <button onclick="setSection('A')">A</button>
+  <button onclick="setSection('B')">B</button>
+  <button onclick="setSection('C')">C</button>
+
+  <h3>Class</h3>
+  <button onclick="setClass('Class3')">Class 3</button>
+  <button onclick="setClass('Class4')">Class 4</button>
+  <button onclick="setClass('Class5')">Class 5</button>
+</div>
+
+<!-- PAGE 2 -->
+<div id="page2" class="screen"></div>
+
+<!-- PAGE 3 -->
+<div id="page3" class="screen"></div>
+
+<!-- PAGE 4 -->
+<div id="page4" class="screen">
+  <h2>✅ Test Ended Successfully</h2>
+</div>
+
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwZmlIYk6S6FMx6xuzG5mNBi9NkoF6-h93XJmXBe3l-2nbCxPNvac6LeMPguE099haw/exec";
+
+let student = {
+  name: "",
+  section: "",
+  class: "",
+  answers: []
+};
+
+const data = {
+Class3: {
+  story: [
+    "I have a pet cat.",
+    "His name is Tom.",
+    "Tom is a white cat.",
+    "He likes to sleep on the mat.",
+    "He likes to drink milk and eat fish."
+  ],
+  storyQ: [
+    "What is this story about?",
+    "What is the cat name?",
+    "What is the colour of the cat?",
+    "Where does the cat sleep?",
+    "What does the cat like to eat?"
+  ],
+  grammarQ: [
+    { q: "Choose one vowel word: I like to eat carrot.", img: "" },
+    { q: "The cat sits ___ the chair (in/on)", img: "https://img.freepik.com/premium-vector/cute-cat-sitting-chair-white-background-16_1095608-2665.jpg?w=2000" },
+    { q: "My name is Ram. ___ like to play (I/He)", img: "" },
+    { q: "The cat is cute. ___ drinks milk (She/It)", img: "" },
+    { q: "Write opposite of wet", img: "" }
+  ]
+},
+
+Class4: {
+  story: [
+    "Pat has a pet hen.",
+    "The hen name is Sheela.",
+    "The hen is red in colour.",
+    "The hen looks fat.",
+    "She has ten eggs in her nest."
+  ],
+  storyQ: [
+    "What is this story about?",
+    "What is the hen name?",
+    "What is the hen colour?",
+    "How does the hen look?",
+    "How many eggs does Sheela have?"
+  ],
+  grammarQ: [
+    { q: "The cat is ___ the box (behind/between)", img: "https://tse4.mm.bing.net/th/id/OIP.D18av6LwZeQyJs-SSWUnhgHaHa" },
+    { q: "Choose correct punctuation: Can you help me ___ (? . ,)", img: "" },
+    { q: "What is the plural form of friend?", img: "" },
+    { q: "Anu has a teddy. ___ is cute (it/she)", img: "" },
+    { q: "Find a vowel word: It is an apple", img: "" }
+  ]
+},
+
+Class5: {
+  story: [
+    "Lily is a 9 year old girl.",
+    "Lily has three roses.",
+    "Her father gave the roses for her birthday.",
+    "The roses are pink.",
+    "Lily put them in her hair."
+  ],
+  storyQ: [
+    "Who is the 9 year old girl?",
+    "What does Lily have?",
+    "Who gave her the roses?",
+    "What is the colour of the roses?",
+    "Where did she put the roses?"
+  ],
+  grammarQ: [
+    { q: "Choose the naming word: eat / drink / ram", img: "" },
+    { q: "___ your name correctly (right/write)", img: "" },
+    { q: "The cat is ___ the boxes (behind/between)", img: "https://static.vecteezy.com/system/resources/previews/021/245/339/non_2x/behind-preposition-english-color-icon-illustration-vector.jpg" },
+    { q: "Max is a ___ puppy (playful/yard/ball)", img: "" },
+    { q: "Me and my friend go to park. ___ played swing (we/they)", img: "" }
+  ]
+}
+};
+
+function setSection(s) {
+  student.section = s;
+}
+
+function setClass(c) {
+  student.name = document.getElementById("name").value.trim();
+  if (!student.name || !student.section) {
+    alert("Enter name and select section");
+    return;
+  }
+  student.class = c;
+  loadStoryPage();
+}
+
+function loadStoryPage() {
+  document.getElementById("page1").classList.remove("active");
+  const p2 = document.getElementById("page2");
+  p2.innerHTML = "<h2>Story</h2>";
+
+  data[student.class].story.forEach(line => {
+    p2.innerHTML += `<p>${line}</p>`;
+  });
+
+  data[student.class].storyQ.forEach((q, i) => {
+    p2.innerHTML += `
+      <div class="question">${i+1}. ${q}</div>
+      <input id="a${i}">
+    `;
+  });
+
+  p2.innerHTML += `<button onclick="loadGrammarPage()">Next</button>`;
+  p2.classList.add("active");
+}
+
+function loadGrammarPage() {
+  document.getElementById("page2").classList.remove("active");
+  const p3 = document.getElementById("page3");
+  p3.innerHTML = "<h2>Grammar</h2>";
+
+  data[student.class].grammarQ.forEach((obj, i) => {
+    p3.innerHTML += `<div class="question">${i+6}. ${obj.q}</div>`;
+    if (obj.img) {
+      p3.innerHTML += `<img src="${obj.img}">`;
+    }
+    p3.innerHTML += `<input id="a${i+5}">`;
+  });
+
+  p3.innerHTML += `<button onclick="submitTest()">Submit</button>`;
+  p3.classList.add("active");
+}
+
+function submitTest() {
+  student.answers = [];
+  for (let i = 0; i < 10; i++) {
+    student.answers.push(document.getElementById("a"+i).value);
+  }
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify(student)
+  })
+  .then(r => r.text())
+  .then(res => {
+    if (res === "DUPLICATE") {
+      alert("You already attempted the test");
+    } else {
+      document.getElementById("page3").classList.remove("active");
+      document.getElementById("page4").classList.add("active");
+    }
+  });
+}
+</script>
+
+</body>
+</html>
